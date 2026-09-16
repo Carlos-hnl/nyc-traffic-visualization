@@ -1,0 +1,333 @@
+/* ============================================================================
+   styles.css - painel de colisoes de NYC
+   Estetica "instrumento de medicao": superficie clara, tipografia IBM Plex,
+   numeros em monoespacada. Codificacao de cor: AZUL = volume (frio),
+   CORAL = gravidade/selecao (quente).
+   ========================================================================== */
+
+:root {
+  --page: #F5F7FA;
+  --panel: #FFFFFF;
+  --surface: #EEF2F7;
+  --ink: #15202B;
+  --muted: #5B6876;
+  --faint: #9AA4AF;
+  --hair: #DCE1E7;
+  --grid: #E6EAEE;
+  --point: #3E7CBE;
+  --accent: #E0662B;
+  --accent-deep: #A8410F;
+  --accent-bg: #FBEDE5;
+  --accent-soft: #EFCBB6;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 22px clamp(16px, 3vw, 34px) 40px;
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ----------------------------- Cabecalho ----------------------------------- */
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 20px 24px;
+  flex-wrap: wrap;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--hair);
+}
+.title-block { flex: 1 1 300px; }
+h1 { margin: 0; font-size: 21px; font-weight: 600; letter-spacing: -0.01em; }
+.subtitle { margin: 3px 0 0; font-size: 13px; color: var(--muted); }
+
+.stats { display: flex; gap: 10px; margin-left: auto; flex-wrap: wrap; }
+.stat {
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 8px 15px;
+  min-width: 86px;
+}
+.stat-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+}
+.stat-value {
+  display: block;
+  font-family: var(--mono);
+  font-size: 23px;
+  font-weight: 500;
+  margin-top: 2px;
+}
+.stat-fatal { color: var(--accent); }
+
+.btn-reset {
+  font: inherit;
+  font-size: 13px;
+  padding: 9px 15px;
+  border: 1px solid var(--hair);
+  border-radius: 9px;
+  background: var(--panel);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+}
+.btn-reset:hover:not(:disabled) { background: var(--surface); border-color: var(--muted); }
+.btn-reset:disabled { opacity: 0.4; cursor: default; }
+
+/* ----------------------------- Controles ----------------------------------- */
+.controls { padding: 16px 0 18px; }
+.chips-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.chips-label { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip {
+  font: inherit;
+  font-size: 12px;
+  padding: 5px 12px;
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.13s;
+}
+.chip:hover { border-color: var(--point); color: var(--ink); }
+.chip.active { background: var(--point); border-color: var(--point); color: #fff; }
+
+/* Controle segmentado de gravidade no painel do mapa (filtro "where") */
+.map-toolbar { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; }
+.seg-label { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.segmented {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--surface);
+  border-radius: 9px;
+}
+.seg-btn {
+  font: inherit;
+  font-size: 12px;
+  padding: 4px 11px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.13s;
+}
+.seg-btn:hover { color: var(--ink); }
+/* Botao ativo: "elevado" (fundo branco + sombra leve). A COR do texto codifica
+   o significado e espelha os pontos do mapa: coral = fatal, azul = nao-fatal. */
+.seg-btn.active {
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgba(21, 32, 43, 0.12);
+}
+.seg-btn.active[data-sev="fatal"] { color: var(--accent-deep); }
+.seg-btn.active[data-sev="nonfatal"] { color: var(--point); }
+
+/* Legenda do mapa de calor - barra de gradiente com rótulos baixo/alto */
+.map-legend {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+.map-legend.visible { display: flex; }
+.map-legend .bar {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(to right, #EAF1F8, #9FC1E8, #3E7CBE, #0B3A6B);
+}
+
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 12px;
+  min-height: 30px;
+}
+.filter-hint { font-size: 12px; color: var(--faint); }
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: inherit;
+  font-size: 12px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--accent-soft);
+  background: var(--accent-bg);
+  color: var(--accent-deep);
+  cursor: pointer;
+  transition: filter 0.13s;
+}
+.pill:hover { filter: brightness(0.97); }
+.pill-x { font-size: 11px; opacity: 0.7; }
+
+/* ----------------------------- Grade das visoes ---------------------------- */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  grid-template-areas:
+    "map bars"
+    "map heat"
+    "time time";
+  gap: 14px;
+  align-items: start;
+}
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--hair);
+  border-radius: 12px;
+  padding: 13px 16px 14px;
+}
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.panel-head h2 { margin: 0; font-size: 14px; font-weight: 600; }
+.panel-sub { font-size: 11px; color: var(--faint); margin-left: auto; }
+.dim-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  background: var(--surface);
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+
+/* SVGs responsivos: viewBox fixo, escala por CSS (mantem brushes corretos) */
+svg { display: block; width: 100%; height: auto; }
+
+/* Eixos e rotulos (sempre em mono, discretos) */
+.axis text, .hm-axis text { font-family: var(--mono); font-size: 10px; fill: var(--muted); }
+.axis .domain, .axis line { stroke: var(--grid); }
+.bar-val { font-family: var(--mono); font-size: 11px; fill: var(--ink); }
+.bar-lab { font-family: var(--sans); font-size: 11px; fill: var(--ink); }
+
+/* Contorno dos bairros (contexto geografico no mapa "where") */
+.borough-shape { transition: fill 0.15s, fill-opacity 0.15s; }
+.borough-shape:hover { fill-opacity: 0.75; }
+.borough-label {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-width: 3px;
+}
+
+/* Brush (selecao retangular) */
+.brush .selection {
+  fill: #15202B;
+  fill-opacity: 0.06;
+  stroke: var(--muted);
+  stroke-opacity: 0.5;
+  shape-rendering: crispEdges;
+}
+
+/* ----------------------------- Tooltip ------------------------------------- */
+#tooltip {
+  position: absolute;
+  top: 0; left: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s;
+  background: var(--panel);
+  border: 1px solid var(--hair);
+  border-radius: 9px;
+  padding: 8px 11px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink);
+  box-shadow: 0 6px 18px rgba(20, 32, 43, 0.12);
+  max-width: 270px;
+  z-index: 60;
+}
+.tip-num { font-family: var(--mono); font-weight: 500; }
+.tip-dim { color: var(--muted); }
+
+/* ----------------------------- Tela de carga ------------------------------- */
+#loading {
+  position: fixed;
+  inset: 0;
+  background: var(--page);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  z-index: 100;
+}
+#loading.hidden { display: none; }
+.spinner {
+  width: 34px; height: 34px;
+  border: 3px solid var(--hair);
+  border-top-color: var(--point);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+#loading-msg { font-family: var(--mono); font-size: 13px; color: var(--muted); margin: 0; }
+.loading-hint { font-size: 12px; color: var(--faint); max-width: 440px; text-align: center; line-height: 1.5; margin: 0; }
+
+/* ----------------------------- Acessibilidade ------------------------------ */
+button:focus-visible, .pill:focus-visible, .chip:focus-visible {
+  outline: 2px solid var(--point);
+  outline-offset: 2px;
+}
+
+/* ----------------------------- Responsivo ---------------------------------- */
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+    grid-template-areas: "map" "bars" "heat" "time";
+  }
+  .stats { margin-left: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, .spinner { transition: none !important; animation: none !important; }
+}
+
+/* ===================== BARRA DE PROGRESSO DE CARREGAMENTO ===================== */
+.progress-bar-wrap {
+  width: 280px;
+  height: 6px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 3px;
+  margin: 12px auto 0;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent, #e07b5a);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
