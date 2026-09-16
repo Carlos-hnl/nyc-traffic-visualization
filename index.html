@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Colisões de trânsito · Nova York</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <!-- ===================== CABEÇALHO + OVERVIEW ===================== -->
+  <header class="app-header">
+    <div class="title-block">
+      <h1>Colisões de trânsito em Nova York</h1>
+      <p class="subtitle">Onde, quando e por quê - quatro visões coordenadas sobre os dados do NYC Open Data</p>
+    </div>
+
+    <div class="stats" aria-label="Resumo do recorte atual">
+      <div class="stat">
+        <span class="stat-label">Colisões</span>
+        <span class="stat-value" id="stat-crashes">-</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Feridos</span>
+        <span class="stat-value" id="stat-injured">-</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Mortes</span>
+        <span class="stat-value stat-fatal" id="stat-killed">-</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Com vítimas</span>
+        <span class="stat-value" id="stat-pct">-</span>
+      </div>
+    </div>
+
+    <button id="reset" class="btn-reset" disabled>Limpar tudo</button>
+  </header>
+
+  <!-- ===================== CONTROLES: BAIRROS + FILTROS ATIVOS ===================== -->
+  <div class="controls">
+    <div class="chips-row">
+      <span class="chips-label">Bairro</span>
+      <div id="chips" class="chips"></div>
+    </div>
+    <div id="filters" class="filter-bar" aria-live="polite"></div>
+  </div>
+
+  <!-- ===================== GRADE DAS VISÕES ===================== -->
+  <main class="grid">
+    <!-- WHERE -->
+    <section class="panel panel-map" style="grid-area: map">
+      <div class="panel-head">
+        <span class="dim-tag">where</span>
+        <h2>Mapa de ocorrências</h2>
+        <span class="panel-sub">arraste para selecionar uma área ou clique num bairro · ponto coral = vítima fatal</span>
+      </div>
+      <div class="map-toolbar">
+        <span class="seg-label">Mostrar</span>
+        <div class="segmented" id="severity" role="group" aria-label="Filtrar por gravidade da colisão">
+          <button class="seg-btn active" data-sev="all" aria-pressed="true">Todos</button>
+          <button class="seg-btn" data-sev="fatal" aria-pressed="false">Com mortes</button>
+          <button class="seg-btn" data-sev="nonfatal" aria-pressed="false">Sem mortes</button>
+        </div>
+        <span class="seg-label" style="margin-left:auto">Visão</span>
+        <div class="segmented" id="mapmode" role="group" aria-label="Alternar entre mapa de pontos e mapa de calor">
+          <button class="seg-btn active" data-mode="points" aria-pressed="true">Pontos</button>
+          <button class="seg-btn" data-mode="heat" aria-pressed="false">Calor</button>
+        </div>
+      </div>
+      <svg id="map" role="img" aria-label="Mapa de pontos das colisões sobre o contorno dos 5 bairros de Nova York"></svg>
+      <div id="map-legend" class="map-legend" aria-hidden="true"></div>
+    </section>
+
+    <!-- WHAT -->
+    <section class="panel" style="grid-area: bars">
+      <div class="panel-head">
+        <span class="dim-tag">what</span>
+        <h2>Fatores contribuintes</h2>
+        <span class="panel-sub">clique para filtrar</span>
+      </div>
+      <svg id="bars" role="img" aria-label="Barras dos fatores contribuintes"></svg>
+    </section>
+
+    <!-- WHEN (cíclico) -->
+    <section class="panel" style="grid-area: heat">
+      <div class="panel-head">
+        <span class="dim-tag">when</span>
+        <h2>Faixa de horário × dia da semana</h2>
+        <span class="panel-sub">mais escuro = mais colisões · clique numa célula</span>
+      </div>
+      <svg id="heatmap" role="img" aria-label="Mapa de calor por faixa de 4 horas e dia da semana"></svg>
+    </section>
+
+    <!-- WHEN (tendência) -->
+    <section class="panel panel-time" style="grid-area: time">
+      <div class="panel-head">
+        <span class="dim-tag">when</span>
+        <h2>Linha do tempo</h2>
+        <span class="panel-sub">arraste para selecionar um intervalo de datas</span>
+      </div>
+      <svg id="timeline" role="img" aria-label="Linha do tempo das colisões por mês"></svg>
+    </section>
+  </main>
+
+  <!-- Tooltip flutuante -->
+  <div id="tooltip" role="tooltip"></div>
+
+  <!-- Tela de carga / erro -->
+  <div id="loading">
+    <div id="loading-spinner" class="spinner" aria-hidden="true"></div>
+    <p id="loading-msg">Iniciando…</p>
+    <div class="progress-bar-wrap" id="progress-wrap" style="display:none">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <p id="loading-hint" class="loading-hint"></p>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

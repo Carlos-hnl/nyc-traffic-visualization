@@ -1,0 +1,18 @@
+{
+  "name": "nyc-collisions-viz",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Painel interativo de colisões de trânsito em Nova York — 4 visões coordenadas com D3.js e DuckDB-WASM.",
+  "scripts": {
+    "dev": "http-server -p 8080 -c-1 .",
+    "start": "http-server -p 8080 -c-1 ."
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "dependencies": {
+    "d3": "^7.9.0",
+    "@duckdb/duckdb-wasm": "^1.29.0"
+  }
+}
